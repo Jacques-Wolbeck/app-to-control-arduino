@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
 
 void main() => runApp(const BlueArduinoApp());
 
@@ -10,7 +11,7 @@ class BlueArduinoApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bluetooth App',
-      //home: const HomeScreen(),
+      home: const HomeScreen(),
       theme: ThemeData(
         primaryColor: Colors.blueGrey,
         primaryColorDark: Colors.black,
