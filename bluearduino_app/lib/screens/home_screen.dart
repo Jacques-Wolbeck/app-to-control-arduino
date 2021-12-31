@@ -15,16 +15,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final FlutterBluetoothSerial _bluetooth = FlutterBluetoothSerial.instance;
   final BluetoothController _bluetoothController = BluetoothController();
   //"late" informs that the variable will receive a value after its declaration
-  late BluetoothState bluetoothState;
+  BluetoothState bluetoothState = BluetoothState.UNKNOWN;
   List<BluetoothDevice> devicesList = [];
-
+  bool _switchButtonState = false;
   //BluetoothConnection? connection;
   // "?" informs that the variable can be null
 
   @override
   void initState() {
     _getCurrentState();
-    _bluetoothController.enableBluetooth(_bluetooth, bluetoothState);
     _bluetooth.onStateChanged().listen((event) => _updateState(event));
     super.initState();
   }
@@ -45,8 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text("BlueArduino"),
+        centerTitle: true,
       ),
       body: _body(),
     );
@@ -54,11 +55,56 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _body() {
     return SafeArea(
-      child: Container(
-        color: Theme.of(context).primaryColor,
-        child: const Center(
-          child: Text('Hi'),
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Enable Bluetooth'),
+                  Switch(
+                    value: _switchButtonState,
+                    onChanged: (newValue) async {
+                      setState(
+                        () {
+                          _switchButtonState = newValue;
+                        },
+                      );
+                      if (_switchButtonState) {
+                        await _bluetoothController.enableBluetooth(
+                            _bluetooth, bluetoothState);
+                        debugPrint("Switch On");
+                      } else {
+                        await _bluetoothController.disableBluetooth(
+                            _bluetooth, bluetoothState);
+                        debugPrint("Switch Off");
+                      }
+                    },
+                  ),
+                  Tooltip(
+                    message: 'Refresh',
+                    child: IconButton(
+                      onPressed: () async {
+                        debugPrint("Refresh");
+                        _bluetoothController.getPairedDevices(_bluetooth);
+                      },
+                      icon: const Icon(Icons.refresh),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
