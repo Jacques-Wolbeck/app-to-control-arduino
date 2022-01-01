@@ -13,12 +13,21 @@ class BlueArduinoApp extends StatelessWidget {
       title: 'Bluetooth App',
       home: const HomeScreen(),
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.blueGrey,
-        /*appBarTheme: const AppBarTheme(
+          brightness: Brightness.dark,
+          primaryColor: Colors.blueGrey,
+          toggleableActiveColor: Colors.lightGreenAccent,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.blueGrey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          )
+          /*appBarTheme: const AppBarTheme(
           color: Colors.grey,
         ),*/
-      ),
+          ),
     );
   }
 }
