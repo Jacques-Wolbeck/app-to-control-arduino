@@ -1,4 +1,5 @@
 import 'package:bluearduino_app/controllers/bluetooth_controller.dart';
+import 'package:bluearduino_app/widgets/devices_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
@@ -14,12 +15,12 @@ class _HomeScreenState extends State<HomeScreen> {
   //Get the instance of the Bluetooth
   final FlutterBluetoothSerial _bluetooth = FlutterBluetoothSerial.instance;
   final BluetoothController _bluetoothController = BluetoothController();
-  //"late" informs that the variable will receive a value after its declaration
+  //Inicializing the bluetooth connection state as unknown
   BluetoothState bluetoothState = BluetoothState.UNKNOWN;
+  //List of all bluetooth devices paired with the smartphone
   List<BluetoothDevice> devicesList = [];
   bool _switchButtonState = false;
-  //BluetoothConnection? connection;
-  // "?" informs that the variable can be null
+  bool _deviceState = false;
 
   @override
   void initState() {
@@ -30,6 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _getCurrentState() async {
     bluetoothState = await FlutterBluetoothSerial.instance.state;
+    devicesList = await _bluetoothController.getPairedDevices(_bluetooth);
+    if (bluetoothState.isEnabled) _switchButtonState = true;
+    setState(() {});
   }
 
   void _updateState(BluetoothState event) async {
@@ -39,8 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
       () {
         bluetoothState = event;
         devicesList = auxList;
+        _switchButtonState = !_switchButtonState;
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _bluetoothController.dispose();
+    super.dispose();
   }
 
   @override
@@ -124,22 +135,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Container(
-          height: 300.0,
-          padding: const EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(10.0),
-            ),
+        height: 300.0,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10.0),
           ),
-          child: _showDevices()),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              'Paired Devices',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColorLight,
+              ),
+            ),
+            _showDevices(),
+          ],
+        ),
+      ),
     );
   }
 
   _showDevices() {
-    debugPrint(devicesList.length.toString());
-    if (bluetoothState == BluetoothState.STATE_OFF ||
-        bluetoothState == BluetoothState.UNKNOWN) {
+    if (!bluetoothState.isEnabled) {
       return const Center(child: Text("Bluetooth is disabled"));
     } else if (devicesList.isEmpty) {
       return const Center(child: Text("No devices are available"));
@@ -152,20 +174,17 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (listContext, index) {
             var device = devicesList[index];
 
-            return Card(
-              child: ListTile(
-                title: Text(device.name.toString()),
-              ),
+            return DevicesCard(
+              cardOnTap: () async {
+                _deviceState =
+                    await _bluetoothController.connectToDevice(context, device);
+              },
+              device: device,
+              deviceState: _deviceState,
             );
           },
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    //TODO
-    super.dispose();
   }
 }

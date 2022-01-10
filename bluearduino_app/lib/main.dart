@@ -15,6 +15,7 @@ class BlueArduinoApp extends StatelessWidget {
       theme: ThemeData(
           brightness: Brightness.dark,
           primaryColor: Colors.blueGrey,
+          primaryColorLight: Colors.lightGreenAccent,
           toggleableActiveColor: Colors.lightGreenAccent,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
