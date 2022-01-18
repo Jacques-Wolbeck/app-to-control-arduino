@@ -1,5 +1,6 @@
 import 'package:bluearduino_app/controllers/bluetooth_controller.dart';
 import 'package:bluearduino_app/widgets/devices_card.dart';
+import 'package:bluearduino_app/widgets/status_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
@@ -20,13 +21,28 @@ class _HomeScreenState extends State<HomeScreen> {
   //List of all bluetooth devices paired with the smartphone
   List<BluetoothDevice> devicesList = [];
   bool _switchButtonState = false;
-  bool _deviceState = false;
 
   @override
   void initState() {
     _getCurrentState();
     _bluetooth.onStateChanged().listen((event) => _updateState(event));
+    _bluetoothController.addListener(() {
+      _showSnackBar();
+    });
     super.initState();
+  }
+
+  void _showSnackBar() {
+    if (_bluetoothController.deviceState == DeviceState.connecting) {
+      StatusSnackBar.show(context, 'Connecting to device...');
+    } else if (_bluetoothController.deviceState ==
+        DeviceState.alreadyConnected) {
+      StatusSnackBar.show(context, 'The device is already connected.');
+    } else if (_bluetoothController.deviceState == DeviceState.connected) {
+      StatusSnackBar.show(context, 'The device is connected.');
+    } else {
+      StatusSnackBar.show(context, 'Error connecting to device.');
+    }
   }
 
   void _getCurrentState() async {
@@ -50,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _bluetoothController.disposeConnection();
     _bluetoothController.dispose();
     super.dispose();
   }
@@ -176,11 +193,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
             return DevicesCard(
               cardOnTap: () async {
-                _deviceState =
-                    await _bluetoothController.connectToDevice(context, device);
+                await _bluetoothController.connectToDevice(device);
               },
               device: device,
-              deviceState: _deviceState,
+              deviceState: _bluetoothController.deviceState,
             );
           },
         ),

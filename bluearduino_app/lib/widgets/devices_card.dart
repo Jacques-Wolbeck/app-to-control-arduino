@@ -1,10 +1,11 @@
+import 'package:bluearduino_app/controllers/bluetooth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 class DevicesCard extends StatelessWidget {
   final Function cardOnTap;
   final BluetoothDevice device;
-  final bool deviceState;
+  final DeviceState deviceState;
 
   const DevicesCard(
       {Key? key,
@@ -28,7 +29,8 @@ class DevicesCard extends StatelessWidget {
           onTap: () => cardOnTap(),
           child: ListTile(
             title: Text(device.name.toString()),
-            subtitle: deviceState
+            subtitle: (deviceState == DeviceState.connected) ||
+                    (deviceState == DeviceState.alreadyConnected)
                 ? Text(
                     "Connected",
                     style:

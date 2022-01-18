@@ -1,12 +1,14 @@
-import 'package:bluearduino_app/widgets/status_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-class BluetoothController {
+enum DeviceState { neutral, connecting, alreadyConnected, connected, error }
+
+class BluetoothController extends ChangeNotifier {
   //Track the connection between the app and bluetooth device
   // "?" informs that the variable can be null
   late BluetoothConnection? _bluetoothConnection;
+  var deviceState = DeviceState.neutral;
 
   Future<void> enableBluetooth(
       FlutterBluetoothSerial bluetooth, BluetoothState bluetoothState) async {
@@ -32,30 +34,29 @@ class BluetoothController {
     }
   }
 
-  Future<bool> connectToDevice(
-      BuildContext context, BluetoothDevice device) async {
+  Future<void> connectToDevice(BluetoothDevice device) async {
+    deviceState = DeviceState.connecting;
+    notifyListeners();
     try {
-      StatusSnackBar.show(context, 'Connecting to device...');
       _bluetoothConnection =
           await BluetoothConnection.toAddress(device.address);
 
       if (_bluetoothConnection != null) {
         if (_bluetoothConnection!.isConnected) {
-          StatusSnackBar.show(context, 'The device is connected.');
+          deviceState = DeviceState.connected;
         } else {
-          StatusSnackBar.show(context, 'The device is already connected.');
+          deviceState = DeviceState.alreadyConnected;
         }
-        return true;
       }
-      return false;
+      notifyListeners();
     } on PlatformException catch (error) {
       debugPrint("Bluetooth Connection: $error");
-      StatusSnackBar.show(context, 'Error connecting to device.');
-      return false;
+      deviceState = DeviceState.error;
+      notifyListeners();
     }
   }
 
-  void dispose() {
+  void disposeConnection() {
     _bluetoothConnection?.dispose();
   }
 }
