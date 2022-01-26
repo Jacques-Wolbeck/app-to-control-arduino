@@ -129,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await _bluetoothController.disableBluetooth(
                       _bluetooth, bluetoothState);
                   debugPrint("Switch Off");
+                  debugPrint("Testing Branchs");
                 }
               },
             ),
