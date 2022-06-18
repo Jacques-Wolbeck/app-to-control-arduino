@@ -19,7 +19,7 @@ class DevicesCard extends StatelessWidget {
     return Card(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(10.0),
+          Radius.circular(15.0),
         ),
       ),
       child: Material(
@@ -28,7 +28,20 @@ class DevicesCard extends StatelessWidget {
           splashColor: Theme.of(context).primaryColorLight,
           onTap: () => cardOnTap(),
           child: ListTile(
-            title: Text(device.name.toString()),
+            //TODO Quando um dispositivo está conectado, o conectado aparece para todos os outros dispositivos também
+            title: device.name! == 'myChevrolet'
+                ? Text('RS232HC-05',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold))
+                : Text(device.name!,
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold)), //RS232HC-05
+            /*subtitle: Text(
+              "Connected",
+              style: TextStyle(color: Theme.of(context).primaryColorLight),
+            ),*/
             subtitle: (deviceState == DeviceState.connected) ||
                     (deviceState == DeviceState.alreadyConnected)
                 ? Text(
@@ -37,6 +50,13 @@ class DevicesCard extends StatelessWidget {
                         TextStyle(color: Theme.of(context).primaryColorLight),
                   )
                 : const Text("Disconnected"),
+            trailing: (deviceState == DeviceState.connected) ||
+                    (deviceState == DeviceState.alreadyConnected)
+                ? Icon(
+                    Icons.bluetooth,
+                    color: Theme.of(context).primaryColorLight,
+                  )
+                : const Icon(Icons.bluetooth),
           ),
         ),
       ),

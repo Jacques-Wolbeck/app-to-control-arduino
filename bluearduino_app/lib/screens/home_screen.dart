@@ -76,8 +76,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text("BlueArduino"),
-        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        title: Text(
+          "BlueArduino",
+          style: TextStyle(
+              color: Theme.of(context).primaryColorLight,
+              fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: Theme.of(context).primaryColorLight,
+            ),
+            onPressed: null,
+          ),
+        ],
       ),
       body: _body(),
     );
@@ -90,10 +104,16 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _enableBluetoothContainer(),
           _devicesListContainer(),
+          _imageContainer(),
           ElevatedButton(
             onPressed: () => _bluetooth.openSettings(),
-            child: const Text("Bluetooth Settings"),
-          )
+            child: Text(
+              "Bluetooth Settings",
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
@@ -112,7 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Enable Bluetooth'),
+            const Text(
+              'Enable Bluetooth',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
             Switch(
               value: _switchButtonState,
               onChanged: (newValue) async {
@@ -140,7 +164,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   debugPrint("Refresh");
                   _bluetoothController.getPairedDevices(_bluetooth);
                 },
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(
+                  Icons.refresh,
+                  color: Colors.white,
+                ),
               ),
             )
           ],
@@ -158,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
           borderRadius: const BorderRadius.all(
-            Radius.circular(10.0),
+            Radius.circular(15.0),
           ),
         ),
         child: Column(
@@ -203,5 +230,43 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
+  }
+
+  _imageContainer() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 200.0,
+        width: 300.0,
+        child: Container(
+          width: 200.0,
+          padding: const EdgeInsets.all(10.0),
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.all(
+              Radius.circular(15.0),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Arduino Uno is connected",
+                style: TextStyle(
+                  color: Colors.lightGreenAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Image.asset(
+                'assets/images/arduino_uno.png',
+                //scale: 6.0,
+                height: 150,
+                width: 200,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
